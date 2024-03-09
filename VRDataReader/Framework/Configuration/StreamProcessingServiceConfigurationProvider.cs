@@ -1,7 +1,7 @@
 ﻿using System.Configuration;
-using VRServices.ConfigurationProviders;
+using VRDataReader.Framework.Configuration.Interfaces;
 
-namespace VRDataReader.Configuration
+namespace VRDataReader.Framework.Configuration
 {
     public class StreamProcessingServiceConfigurationProvider : IStreamProcessingServiceConfigurationProvider
     {

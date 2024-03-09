@@ -1,11 +1,10 @@
 ﻿using VRCore.Entities;
-using VRCore.Exceptions;
-using VRCore.Loggers.Interface;
+using VRCore.Interface;
 using VRDatabase.Repositories.Interfaces;
-using VRServices.ConfigurationProviders;
-using VRServices.Services.Interfaces;
+using VRDataReader.Framework.Configuration.Interfaces;
+using VRDataReader.Services.Interfaces;
 
-namespace VRServices.Services
+namespace VRDataReader.Services
 {
     public class StreamProcessingService : IStreamProcessingService
     {
@@ -18,7 +17,7 @@ namespace VRServices.Services
             _configurationProvider = configurationProvider;
             _boxRepository = boxRepository;
             _logger = logger;
-        }        
+        }
 
         public async Task ProcessAsync(StreamReader streamReader)
         {

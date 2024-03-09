@@ -1,8 +1,8 @@
 ﻿using System.Configuration;
-using VRCore.Exceptions;
-using VRServices.ConfigurationProviders;
+using VRDataReader.Framework.Configuration.Interfaces;
+using VRDataReader.Framework.Exceptions;
 
-namespace VRDataReader.Configuration
+namespace VRDataReader.Framework.Configuration
 {
     public class DataReaderServiceConfigurationProvider : IDataReaderServiceConfigurationProvider
     {

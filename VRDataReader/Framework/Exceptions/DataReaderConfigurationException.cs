@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace VRCore.Exceptions
+namespace VRDataReader.Framework.Exceptions
 {
     [Serializable]
     public class DataReaderConfigurationException : Exception

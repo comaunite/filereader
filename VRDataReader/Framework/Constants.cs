@@ -1,4 +1,4 @@
-﻿namespace VRDataReader
+﻿namespace VRDataReader.Framework
 {
     public static partial class Constants
     {

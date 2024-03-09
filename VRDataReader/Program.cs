@@ -1,16 +1,16 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using Microsoft.Extensions.DependencyInjection;
-using VRCore.Loggers;
-using VRCore.Loggers.Interface;
+using VRCore.Interface;
 using VRDatabase;
 using VRDatabase.Interfaces;
 using VRDatabase.Repositories;
 using VRDatabase.Repositories.Interfaces;
-using VRDataReader.Configuration;
-using VRServices.ConfigurationProviders;
-using VRServices.Services;
-using VRServices.Services.Interfaces;
+using VRDataReader.Framework;
+using VRDataReader.Framework.Configuration;
+using VRDataReader.Framework.Configuration.Interfaces;
+using VRDataReader.Services;
+using VRDataReader.Services.Interfaces;
 
 Console.WriteLine("Starting the VR Data Reader...");
 Console.WriteLine("=================================================================");

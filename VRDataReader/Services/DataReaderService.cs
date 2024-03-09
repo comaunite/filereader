@@ -1,11 +1,11 @@
-﻿using VRCore.Loggers.Interface;
-using VRServices.ConfigurationProviders;
-using VRServices.Services.Interfaces;
+﻿using VRCore.Interface;
+using VRDataReader.Framework.Configuration.Interfaces;
+using VRDataReader.Services.Interfaces;
 
-namespace VRServices.Services
+namespace VRDataReader.Services
 {
     public class DataReaderService : IDataReaderService
-    {        
+    {
         private readonly IDataReaderServiceConfigurationProvider _configurationProvider;
         private readonly IStreamProcessingService _streamProcessingService;
         private readonly ILogger _logger;
@@ -59,7 +59,7 @@ namespace VRServices.Services
         }
 
         private void Init()
-        {            
+        {
             Directory.CreateDirectory(_configurationProvider.ListeningPath);
             Directory.CreateDirectory(_configurationProvider.TempPath);
             Directory.CreateDirectory(_configurationProvider.FailedPath);

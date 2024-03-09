@@ -1,6 +1,6 @@
-﻿using VRCore.Loggers.Interface;
+﻿using VRCore.Interface;
 
-namespace VRCore.Loggers
+namespace VRDataReader.Framework
 {
     public class ConsoleLogger : ILogger
     {

@@ -1,4 +1,4 @@
-﻿namespace VRCore.Loggers.Interface
+﻿namespace VRCore.Interface
 {
     public interface ILogger
     {

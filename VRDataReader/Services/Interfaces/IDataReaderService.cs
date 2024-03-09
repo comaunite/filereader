@@ -1,4 +1,4 @@
-﻿namespace VRServices.Services.Interfaces
+﻿namespace VRDataReader.Services.Interfaces
 {
     public interface IDataReaderService
     {

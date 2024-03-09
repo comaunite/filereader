@@ -1,4 +1,4 @@
-﻿namespace VRServices.ConfigurationProviders
+﻿namespace VRDataReader.Framework.Configuration.Interfaces
 {
     public interface IStreamProcessingServiceConfigurationProvider
     {

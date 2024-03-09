@@ -15,7 +15,6 @@
   <ItemGroup>
     <ProjectReference Include="..\VRDatabase\VRDatabase.csproj" />
 	<ProjectReference Include="..\VRCore\VRCore.csproj" />
-	<ProjectReference Include="..\VRServices\VRServices.csproj" />
   </ItemGroup>
 
 </Project>
