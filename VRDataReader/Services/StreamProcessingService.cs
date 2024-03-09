@@ -2,6 +2,7 @@
 using VRCore.Interface;
 using VRDatabase.Repositories.Interfaces;
 using VRDataReader.Framework.Configuration.Interfaces;
+using VRDataReader.Framework.Exceptions;
 using VRDataReader.Services.Interfaces;
 
 namespace VRDataReader.Services
