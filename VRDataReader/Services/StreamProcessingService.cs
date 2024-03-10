@@ -23,6 +23,7 @@ namespace VRDataReader.Services
         public async Task ProcessAsync(StreamReader streamReader)
         {
             List<Box> boxBatch = [];
+            int totalBoxCounter = 0;
 
             var line = await streamReader.ReadLineAsync();
 
@@ -32,44 +33,35 @@ namespace VRDataReader.Services
                 {
                     var box = InitBox(line);
 
-                    if (!await _boxRepository.Exists(t =>
-                        t.BoxIdentifier.Equals(box.BoxIdentifier)
-                        && t.SupplierIdentifier.Equals(box.SupplierIdentifier)))
+                    boxBatch.Add(box);
+
+                    _logger.Log($"Found box #{++totalBoxCounter} by Id {box.BoxIdentifier}... Reading contents...");
+
+                    line = await streamReader.ReadLineAsync();
+
+                    while (!streamReader.EndOfStream
+                        && !(line?.StartsWith(_configurationProvider.BoxLineIdentifier) ?? false))
                     {
-                        _logger.Log($"Found box {box.BoxIdentifier}... Reading contents...");
+                        if (line?.StartsWith(_configurationProvider.ItemLineIdentifier) ?? false)
+                        {
+                            var item = InitItem(line);
+
+                            _logger.Log($"Adding item {item.Isbn}...");
+
+                            box.Items.Add(item);
+                        }
 
                         line = await streamReader.ReadLineAsync();
-
-                        while (!streamReader.EndOfStream
-                            && !(line?.StartsWith(_configurationProvider.BoxLineIdentifier) ?? false))
-                        {
-                            if (line?.StartsWith(_configurationProvider.ItemLineIdentifier) ?? false)
-                            {
-                                var item = InitItem(line);
-
-                                _logger.Log($"Adding item {item.Isbn}...");
-
-                                box.Items.Add(item);
-                            }
-
-                            line = await streamReader.ReadLineAsync();
-                        }
-
-                        boxBatch.Add(box);
-
-                        if (boxBatch.Count >= _configurationProvider.BatchSize
-                            || streamReader.EndOfStream)
-                        {
-                            _logger.Log($"Saving {boxBatch.Count} boxes into DB...");
-
-                            await _boxRepository.BulkInsertAsync(boxBatch);
-
-                            boxBatch = [];
-                        }
                     }
-                    else
+
+                    if (boxBatch.Count >= _configurationProvider.BatchSize
+                        || streamReader.EndOfStream)
                     {
-                        _logger.Log($"WARN: Box {box.BoxIdentifier} already exists in DB, skipping...");
+                        _logger.Log($"Saving {boxBatch.Count} boxes into DB...");
+
+                        await _boxRepository.BulkInsertAsync(boxBatch);
+
+                        boxBatch.Clear();
                     }
                 }
             }

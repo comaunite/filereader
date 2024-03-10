@@ -15,6 +15,13 @@ using VRDataReader.Services.Interfaces;
 Console.WriteLine("Starting the VR Data Reader...");
 Console.WriteLine("=================================================================");
 
+Console.WriteLine("Disclamer: I decided to omit retry policy, as this wasn't really discussed in requirements");
+Console.WriteLine("and at files larger than (N)Gb, best bet is to probably delete all previous attempt contents from DB...");
+Console.WriteLine("I also was a bit too lazy to implement UnitTests, but made structure reasonable enough to run them.");
+Console.WriteLine("Generally speaking, I tried to optimize for memory footprint, so some 'nice' things had to go.");
+
+Console.WriteLine("=================================================================");
+
 ServiceCollection services = new();
 
 services.AddScoped<IDbContext, DbContext>();

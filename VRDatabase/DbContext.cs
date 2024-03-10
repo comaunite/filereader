@@ -1,15 +1,28 @@
-﻿using VRCore.Entities;
+﻿using System.Configuration;
 using VRDatabase.Interfaces;
 
 namespace VRDatabase
 {
     public sealed class DbContext : IDbContext
     {
-        public List<Box> Boxes { get; private set; }
+        private string? _connectionString;
 
-        public DbContext()
+        public string ConnectionString
         {
-            Boxes = [];
+            get
+            {
+                if (_connectionString == null)
+                {
+                    _connectionString = ConfigurationManager.ConnectionStrings["VR"]?.ToString();
+
+                    if (_connectionString == null)
+                    {
+                        throw new Exception("ConnectionString VR not found!");
+                    }
+                }
+
+                return _connectionString;
+            }
         }
 
         public void Dispose()

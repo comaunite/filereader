@@ -4,6 +4,6 @@ namespace VRDatabase.Interfaces
 {
     public interface IDbContext : IDisposable
     {
-        List<Box> Boxes { get; }
+        string ConnectionString { get; }
     }
 }
