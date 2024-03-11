@@ -1,4 +1,4 @@
-﻿using VRCore.Interface;
+﻿using VRCore.Logger.Interfaces;
 using VRDataReader.Framework.Configuration.Interfaces;
 using VRDataReader.Services.Interfaces;
 

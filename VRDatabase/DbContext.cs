@@ -17,7 +17,7 @@ namespace VRDatabase
 
                     if (_connectionString == null)
                     {
-                        throw new Exception("ConnectionString VR not found!");
+                        throw new Exception("ConnectionString 'VR' not found!");
                     }
                 }
 

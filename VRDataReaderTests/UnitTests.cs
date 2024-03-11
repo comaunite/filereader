@@ -1,7 +1,7 @@
 using System.Text;
 using Moq;
 using VRCore.Entities;
-using VRCore.Interface;
+using VRCore.Logger.Interfaces;
 using VRDatabase.Repositories.Interfaces;
 using VRDataReader.Framework.Configuration.Interfaces;
 using VRDataReader.Services;
