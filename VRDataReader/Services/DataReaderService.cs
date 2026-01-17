@@ -4,73 +4,63 @@ using VRDataReader.Services.Interfaces;
 
 namespace VRDataReader.Services
 {
-    public class DataReaderService : IDataReaderService
+    public class DataReaderService(IDataReaderServiceConfigurationProvider configurationProvider, IStreamProcessingService streamProcessingService,
+        ILogger logger) : IDataReaderService
     {
-        private readonly IDataReaderServiceConfigurationProvider _configurationProvider;
-        private readonly IStreamProcessingService _streamProcessingService;
-        private readonly ILogger _logger;
-
-        public DataReaderService(IDataReaderServiceConfigurationProvider configurationProvider, IStreamProcessingService streamProcessingService, ILogger logger)
-        {
-            _configurationProvider = configurationProvider;
-            _streamProcessingService = streamProcessingService;
-            _logger = logger;
-        }
-
         public async Task ReadAsync()
         {
             Init();
 
-            var files = new DirectoryInfo(_configurationProvider.ListeningPath).GetFiles("*");
+            var files = new DirectoryInfo(configurationProvider.ListeningPath).GetFiles("*");
 
-            if (files == null || files.Length == 0)
+            if (files.Length == 0)
             {
-                _logger.Log($"No files found in {_configurationProvider.ListeningPath}");
+                logger.Log($"No files found in {configurationProvider.ListeningPath}");
 
                 return;
             }
 
-            _logger.Log($"Found {files.Length} files in {_configurationProvider.ListeningPath}");
+            logger.Log($"Found {files.Length} files in {configurationProvider.ListeningPath}");
 
             foreach (var file in files)
             {
                 try
                 {
-                    _logger.Log($"Processing file {file.Name}");
+                    logger.Log($"Processing file {file.Name}");
 
-                    MoveFile(file, _configurationProvider.TempPath, $"{file.Name}_{DateTime.Now:ddMMyyyyHHmmss}");
+                    MoveFile(file, configurationProvider.TempPath, $"{file.Name}_{DateTime.Now:ddMMyyyyHHmmss}");
 
                     using (var streamReader = new StreamReader(file.FullName))
                     {
-                        await _streamProcessingService.ProcessAsync(streamReader);
+                        await streamProcessingService.ProcessAsync(streamReader);
                     }
 
-                    _logger.Log($"Finished processing file {file.Name}");
+                    logger.Log($"Finished processing file {file.Name}");
 
-                    MoveFile(file, _configurationProvider.ProcessedPath, file.Name);
+                    MoveFile(file, configurationProvider.ProcessedPath, file.Name);
                 }
                 catch (Exception ex)
                 {
-                    _logger.Log($"ERROR: {ex.Message}");
+                    logger.Log($"ERROR: {ex.Message}");
 
-                    MoveFile(file, _configurationProvider.FailedPath, file.Name);
+                    MoveFile(file, configurationProvider.FailedPath, file.Name);
                 }
             }
         }
 
         private void Init()
         {
-            Directory.CreateDirectory(_configurationProvider.ListeningPath);
-            Directory.CreateDirectory(_configurationProvider.TempPath);
-            Directory.CreateDirectory(_configurationProvider.FailedPath);
-            Directory.CreateDirectory(_configurationProvider.ProcessedPath);
+            Directory.CreateDirectory(configurationProvider.ListeningPath);
+            Directory.CreateDirectory(configurationProvider.TempPath);
+            Directory.CreateDirectory(configurationProvider.FailedPath);
+            Directory.CreateDirectory(configurationProvider.ProcessedPath);
         }
 
         private void MoveFile(FileInfo file, string path, string newName)
         {
             file.MoveTo(Path.Combine(path, newName));
 
-            _logger.Log($"File {file.Name} moved into {path}");
+            logger.Log($"File {file.Name} moved into {path}");
         }
     }
 }

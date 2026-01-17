@@ -1,6 +1,7 @@
-﻿namespace VRDataReader.Framework
+﻿// ReSharper disable InconsistentNaming
+namespace VRDataReader.Framework
 {
-    public static partial class Constants
+    public static class Constants
     {
         public const string LISTENING_DIR_CONFIG_KEY = "listeningDir";
         public const string TEMP_DIR_CONFIG_KEY = "tempDir";

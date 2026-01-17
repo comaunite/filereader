@@ -7,46 +7,41 @@ using VRDataReader.Services.Interfaces;
 
 namespace VRDataReader.Services
 {
-    public class StreamProcessingService : IStreamProcessingService
+    public class StreamProcessingService(IStreamProcessingServiceConfigurationProvider configurationProvider, IBoxRepository boxRepository, ILogger logger)
+        : IStreamProcessingService
     {
-        private readonly IStreamProcessingServiceConfigurationProvider _configurationProvider;
-        private readonly IBoxRepository _boxRepository;
-        private readonly ILogger _logger;
-
-        public StreamProcessingService(IStreamProcessingServiceConfigurationProvider configurationProvider, IBoxRepository boxRepository, ILogger logger)
-        {
-            _configurationProvider = configurationProvider;
-            _boxRepository = boxRepository;
-            _logger = logger;
-        }
-
         public async Task ProcessAsync(StreamReader streamReader)
         {
-            List<Box> boxBatch = [];
-            int totalBoxCounter = 0;
+            var boxBatch = new List<Box>(configurationProvider.BatchSize);
+            var totalBoxCounter = 0;
 
             var line = await streamReader.ReadLineAsync();
 
-            while (!streamReader.EndOfStream)
+            while (line != null)
             {
-                if (line?.StartsWith(_configurationProvider.BoxLineIdentifier) ?? false)
+                var lineSpan = line.AsSpan();
+
+                if (lineSpan.StartsWith(configurationProvider.BoxLineIdentifier))
                 {
-                    var box = InitBox(line);
+                    var box = InitBox(lineSpan);
 
                     boxBatch.Add(box);
 
-                    _logger.Log($"Found box #{++totalBoxCounter} by Id {box.BoxIdentifier}... Reading contents...");
+                    logger.Log($"Found box #{++totalBoxCounter} by Id {box.BoxIdentifier}... Reading contents...");
 
+
+                    // Read box items
                     line = await streamReader.ReadLineAsync();
 
-                    while (!streamReader.EndOfStream
-                        && !(line?.StartsWith(_configurationProvider.BoxLineIdentifier) ?? false))
+                    while (line != null && !line.StartsWith(configurationProvider.BoxLineIdentifier))
                     {
-                        if (line?.StartsWith(_configurationProvider.ItemLineIdentifier) ?? false)
-                        {
-                            var item = InitItem(line);
+                        var itemSpan = line.AsSpan();
 
-                            _logger.Log($"Adding item {item.Isbn}...");
+                        if (itemSpan.StartsWith(configurationProvider.ItemLineIdentifier))
+                        {
+                            var item = InitItem(itemSpan);
+
+                            logger.Log($"Adding item {item.Isbn}...");
 
                             box.Items.Add(item);
                         }
@@ -54,49 +49,55 @@ namespace VRDataReader.Services
                         line = await streamReader.ReadLineAsync();
                     }
 
-                    if (boxBatch.Count >= _configurationProvider.BatchSize
-                        || streamReader.EndOfStream)
+                    if (boxBatch.Count >= configurationProvider.BatchSize || line == null)
                     {
-                        _logger.Log($"Saving {boxBatch.Count} boxes into DB...");
-
-                        await _boxRepository.BulkInsertAsync(boxBatch);
-
-                        boxBatch.Clear();
+                        await SaveChangesAsync(boxBatch);
                     }
+
+                    continue;
                 }
+
+                // Not a box, keep reading
+                line = await streamReader.ReadLineAsync();
             }
         }
 
-        private static Box InitBox(string line)
+        private async Task SaveChangesAsync(List<Box> boxBatch)
         {
-            var supplierIdentifier = line.Substring(5, 92).Trim();
-            var boxIdentifier = line.Substring(96, 35).Trim();
+            if (boxBatch.Count == 0)
+                return;
 
-            var box = new Box()
+            logger.Log($"Saving {boxBatch.Count} boxes into DB...");
+
+            await boxRepository.BulkInsertAsync(boxBatch);
+
+            boxBatch.Clear();
+        }
+
+        private static Box InitBox(ReadOnlySpan<char> line)
+        {
+            return new Box
             {
-                SupplierIdentifier = supplierIdentifier,
-                BoxIdentifier = boxIdentifier
+                SupplierIdentifier = line.Slice(5, 92).Trim().ToString(),
+                BoxIdentifier = line.Slice(96, 35).Trim().ToString()
             };
-
-            return box;
         }
 
-        private static Item InitItem(string line)
+        private static Item InitItem(ReadOnlySpan<char> line)
         {
-            var poNumber = line.Substring(5, 37).Trim();
-            var isbn = line.Substring(42, 34).Trim();
-            var quantity = line.Substring(76, 7).Trim();
+            var isbnSpan = line.Slice(42, 34).Trim();
+            var quantitySpan = line.Slice(76, 7).Trim();
 
-            if (!int.TryParse(quantity, out int intQuantity))
+            if (!int.TryParse(quantitySpan, out var quantity))
             {
-                throw new StreamReaderProcessingException($"Failed to parse item count for Line {isbn}");
+                throw new StreamReaderProcessingException($"Failed to parse item count for Line {isbnSpan}");
             }
 
-            var item = new Item()
+            var item = new Item
             {
-                PoNumber = poNumber,
-                Isbn = isbn,
-                Quantity = intQuantity
+                PoNumber = line.Slice(5, 37).Trim().ToString(),
+                Isbn = isbnSpan.ToString(),
+                Quantity = quantity
             };
 
             return item;

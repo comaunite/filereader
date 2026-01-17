@@ -10,7 +10,10 @@ namespace VRDataReaderTests
 {
     public class UnitTests
     {
-        [Fact(Skip = "Fake test to analyze memory consumption during development")]
+        /// <summary>
+        /// Fake test to analyze memory consumption
+        /// </summary>
+        [Fact]
         public async Task StressTest()
         {
             var configurationProvider = new Mock<IStreamProcessingServiceConfigurationProvider>(MockBehavior.Strict);
@@ -31,7 +34,7 @@ namespace VRDataReaderTests
 
             var randomizer = new Random();
 
-            for (int i = 0; i < 1_000; i++)
+            for (var i = 0; i < 1_000; i++)
             {
                 var rnd1 = randomizer.Next(100_000, 999_999);
                 var rnd2 = randomizer.Next(100_000, 999_999);
@@ -39,7 +42,7 @@ namespace VRDataReaderTests
                 builder.AppendLine($"HDR  T{rnd1}                                                                                     68{rnd2}                           ");
                 builder.AppendLine();
 
-                for (int j = 0; j < 10; j++)
+                for (var j = 0; j < 10; j++)
                 {
                     var rndL1 = randomizer.Next(100_000, 999_999);
                     var rndL2 = randomizer.Next(100_000, 999_999);

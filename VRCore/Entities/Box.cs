@@ -4,17 +4,10 @@ namespace VRCore.Entities
 {
     public class Box : EntityBase
     {
-        public string BoxIdentifier { get; set; }
+        public string BoxIdentifier { get; set; } = string.Empty;
 
-        public string SupplierIdentifier { get; set; }
+        public string SupplierIdentifier { get; set; } = string.Empty;
 
-        public IList<Item> Items { get; set; }
-
-        public Box()
-        {
-            BoxIdentifier = string.Empty;
-            SupplierIdentifier = string.Empty;
-            Items = new List<Item>();
-        }
+        public IList<Item> Items { get; set; } = [ ];
     }
 }
